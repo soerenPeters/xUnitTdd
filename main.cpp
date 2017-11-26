@@ -3,6 +3,7 @@
 #include <sstream>
 #include <assert.h>
 #include <exception>
+#include <vector>
 
 class TestResult
 {
@@ -35,6 +36,7 @@ private:
     int count;
     int errorCount;
 };
+
 
 template <class T>
 class TestCase
@@ -99,6 +101,20 @@ public:
     std::string log;
 };
 
+class TestSuite
+{
+public:
+    void add(WasRun* test)
+    {
+
+    }
+    TestResult run()
+    {
+        return TestResult();
+    }
+
+};
+
 class TestCaseTest
         : public TestCase<TestCaseTest>
 {
@@ -135,6 +151,18 @@ public:
         delete failingTest;
     }
 
+    void testSuite()
+    {
+        TestSuite* suite = new TestSuite();
+
+        suite->add(new WasRun(&WasRun::testMethod));
+        suite->add(new WasRun(&WasRun::brokenTestMethod));
+        TestResult result = suite->run();
+
+        assert(result.summary()  == "2 run, 1 failed");
+        delete suite;
+    }
+
 private:
     WasRun* passingTest;
 };
@@ -144,6 +172,7 @@ int main()
     std::cout << TestCaseTest(&TestCaseTest::testTemplateMethod).run().summary() << std::endl;
     std::cout << TestCaseTest(&TestCaseTest::testResult).run().summary() << std::endl;
     std::cout << TestCaseTest(&TestCaseTest::testBrokenTest).run().summary() << std::endl;
+    std::cout << TestCaseTest(&TestCaseTest::testSuite).run().summary() << std::endl;
 
     return 0;
 }
