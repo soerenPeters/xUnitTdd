@@ -27,12 +27,12 @@ class WasRun
 public:
     WasRun(void (WasRun::*name)()) : TestCase(name)
     {
-        wasRun = false;
         wasSetUp = false;
     }
 
     void setUp()
     {
+        wasRun = false;
         wasSetUp = true;
     }
 
@@ -51,11 +51,13 @@ class TestCaseTest
 public:
     TestCaseTest(void (TestCaseTest::*name)()) : TestCase(name) {}
 
+    void setUp()
+    {
+        test = new WasRun(&WasRun::testMethod);
+    }
+
     void testRunning()
     {
-        WasRun* test = new WasRun(&WasRun::testMethod);
-
-        assert(!test->wasRun);
         test->run();
         assert(test->wasRun);
 
@@ -64,13 +66,13 @@ public:
 
     void testSetUp()
     {
-        WasRun* test = new WasRun(&WasRun::testMethod);
-        
         test->run();
         assert(test->wasSetUp);
 
         delete test;
     }
+
+    WasRun* test;
 };
 
 int main()
