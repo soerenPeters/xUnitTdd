@@ -1,13 +1,31 @@
 #include <iostream>
+#include <string>
+#include <sstream>
 #include <assert.h>
 
 class TestResult
 {
 public:
+    TestResult()
+    {
+        count = 0;
+    }
+
+    void testStarted()
+    {
+        count++;
+    }
+
     std::string summary()
     {
-        return "";
+        std::stringstream ss;
+        ss << count;
+        ss <<  " run, 0 failed";
+        return ss.str();
     }
+
+private:
+    int count;
 };
 
 template <class T>
@@ -24,11 +42,14 @@ public:
 
     TestResult run()
     {
+        TestResult result = TestResult();
+        result.testStarted();
+
         setUp();
         ((static_cast<T*>(this))->*name)();
         tearDown();
 
-        return TestResult();
+        return result;
     }
 
 private:
