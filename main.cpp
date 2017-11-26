@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <exception>
 #include <vector>
+#include <memory>
 
 class TestResult
 {
@@ -27,8 +28,7 @@ public:
     std::string summary()
     {
         std::stringstream ss;
-        ss << count;
-        ss <<  " run, " << errorCount << " failed";
+        ss <<  count << " run, " << errorCount << " failed";
         return ss.str();
     }
 
@@ -103,19 +103,19 @@ template <class T>
 class TestSuite
 {
 public:
-    void add(TestCase<T>* test)
+    void add(std::shared_ptr<TestCase<T> > test)
     {
         tests.push_back(test);
     }
 
-    void run(TestResult *result)
+    void run(TestResult* result)
     {
-        for (TestCase<T>* test : tests)
+        for (std::shared_ptr<TestCase<T> > test : tests)
             test->run(result);
     }
 
 private:
-    std::vector<TestCase<T>*> tests;
+    std::vector<std::shared_ptr<TestCase<T> > > tests;
 
 };
 
@@ -161,8 +161,8 @@ public:
     {
         TestSuite<WasRun>* suite = new TestSuite<WasRun>();
 
-        suite->add(new WasRun(&WasRun::testMethod));
-        suite->add(new WasRun(&WasRun::brokenTestMethod));
+        suite->add(std::shared_ptr<WasRun>(new WasRun(&WasRun::testMethod)));
+        suite->add(std::shared_ptr<WasRun>(new WasRun(&WasRun::brokenTestMethod)));
         suite->run(result);
 
         assert(result->summary()  == "2 run, 1 failed");
@@ -177,10 +177,10 @@ private:
 int main()
 {
     TestSuite<TestCaseTest> suite;
-    suite.add(new TestCaseTest(&TestCaseTest::testTemplateMethod));
-    suite.add(new TestCaseTest(&TestCaseTest::testResult));
-    suite.add(new TestCaseTest(&TestCaseTest::testBrokenTest));
-    suite.add(new TestCaseTest(&TestCaseTest::testSuite));
+    suite.add(std::shared_ptr<TestCaseTest>(new TestCaseTest(&TestCaseTest::testTemplateMethod)));
+    suite.add(std::shared_ptr<TestCaseTest>(new TestCaseTest(&TestCaseTest::testResult)));
+    suite.add(std::shared_ptr<TestCaseTest>(new TestCaseTest(&TestCaseTest::testBrokenTest)));
+    suite.add(std::shared_ptr<TestCaseTest>(new TestCaseTest(&TestCaseTest::testSuite)));
 
     TestResult* result = new TestResult();
     suite.run(result);
