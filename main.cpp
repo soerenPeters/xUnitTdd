@@ -50,7 +50,7 @@ public:
     virtual void setUp(){}
     virtual void tearDown(){}
 
-    void run(TestResult* result)
+    void run(std::shared_ptr<TestResult> result)
     {
         result->testStarted();
         setUp();
@@ -108,9 +108,9 @@ public:
         tests.push_back(test);
     }
 
-    void run(TestResult* result)
+    void run(std::shared_ptr<TestResult> result)
     {
-        for (std::shared_ptr<TestCase<T> > test : tests)
+        for (const std::shared_ptr<TestCase<T> > test : tests)
             test->run(result);
     }
 
@@ -128,13 +128,12 @@ public:
     void setUp() override
     {
         passingTest = new WasRun(&WasRun::testMethod);
-        result = new TestResult();
+        result = std::make_shared<TestResult>();
     }
 
     void tearDown() override
     {
         delete passingTest;
-        delete result;
     }
 
     void testTemplateMethod()
@@ -171,7 +170,7 @@ public:
 
 private:
     WasRun* passingTest;
-    TestResult* result;
+    std::shared_ptr<TestResult> result;
 };
 
 int main()
@@ -182,7 +181,7 @@ int main()
     suite.add(std::shared_ptr<TestCaseTest>(new TestCaseTest(&TestCaseTest::testBrokenTest)));
     suite.add(std::shared_ptr<TestCaseTest>(new TestCaseTest(&TestCaseTest::testSuite)));
 
-    TestResult* result = new TestResult();
+    std::shared_ptr<TestResult> result = std::make_shared<TestResult>();
     suite.run(result);
     std::cout << result->summary() << std::endl;
 
