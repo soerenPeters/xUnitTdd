@@ -1,8 +1,27 @@
-#include "stdio.h"
+#include <iostream>
+#include <string>
 
+class WasRun
+{
+public:
+    WasRun(std::string name)
+    {
+        wasRun = false;
+    }
+    void testMethod(){
+
+    }
+    
+    bool wasRun;
+};
 
 int main()
 {
-    printf("hello world");
+    WasRun* test = new WasRun("testMethod");
+    std::cout << test->wasRun << std::endl;
+    test->testMethod();
+    std::cout << test->wasRun << std::endl;
+
+    delete test;
     return 0;
 }
