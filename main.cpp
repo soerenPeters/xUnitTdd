@@ -1,6 +1,15 @@
 #include <iostream>
 #include <assert.h>
 
+class TestResult
+{
+public:
+    std::string summary()
+    {
+        return "";
+    }
+};
+
 template <class T>
 class TestCase
 {
@@ -13,11 +22,13 @@ public:
     virtual void setUp(){}
     virtual void tearDown(){}
 
-    void run()
+    TestResult run()
     {
         setUp();
         ((static_cast<T*>(this))->*name)();
         tearDown();
+
+        return TestResult();
     }
 
 private:
@@ -33,7 +44,7 @@ public:
 
     }
 
-    void setUp()
+    void setUp() override
     {
         log += "setUp ";
     }
@@ -43,7 +54,7 @@ public:
         log += "wasRun ";
     }
 
-    void tearDown()
+    void tearDown() override
     {
         log += "tearDown ";
     }
@@ -57,21 +68,36 @@ class TestCaseTest
 public:
     TestCaseTest(void (TestCaseTest::*name)()) : TestCase(name) {}
 
-    void testTemplateMethod()
+    void setUp() override
     {
         test = new WasRun(&WasRun::testMethod);
-        test->run();
-        assert(test->log  == "setUp wasRun tearDown ");
+    }
 
+    void tearDown() override
+    {
         delete test;
     }
 
+    void testTemplateMethod()
+    {
+        test->run();
+        assert(test->log  == "setUp wasRun tearDown ");
+    }
+
+    void testResult()
+    {
+        TestResult result = test->run();
+        assert(result.summary()  == "1 run, 0 failed");
+    }
+
+private:
     WasRun* test;
 };
 
 int main()
 {
     TestCaseTest(&TestCaseTest::testTemplateMethod).run();
+    TestCaseTest(&TestCaseTest::testResult).run();
 
     return 0;
 }
