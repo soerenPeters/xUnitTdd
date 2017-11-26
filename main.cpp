@@ -10,8 +10,11 @@ public:
         this->name = name;
     }
 
+    virtual void setUp(){}
+
     void run()
     {
+        setUp();
         ((static_cast<T*>(this))->*name)();
     }
 private:
@@ -26,6 +29,11 @@ public:
     {
         wasRun = false;
         wasSetUp = false;
+    }
+
+    void setUp()
+    {
+        wasSetUp = true;
     }
 
     void testMethod()
