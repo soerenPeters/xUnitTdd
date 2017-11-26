@@ -1,5 +1,5 @@
 #include <iostream>
-
+#include <assert.h>
 
 template <class T>
 class TestCase
@@ -55,9 +55,9 @@ public:
     {
         WasRun* test = new WasRun(&WasRun::testMethod);
 
-        std::cout << test->wasRun << std::endl;
+        assert(!test->wasRun);
         test->run();
-        std::cout << test->wasRun << std::endl;
+        assert(test->wasRun);
 
         delete test;
     }
@@ -65,8 +65,9 @@ public:
     void testSetUp()
     {
         WasRun* test = new WasRun(&WasRun::testMethod);
+        
         test->run();
-        std::cout << test->wasSetUp << std::endl;
+        assert(test->wasSetUp);
 
         delete test;
     }
