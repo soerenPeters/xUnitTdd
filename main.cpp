@@ -14,7 +14,7 @@ public:
     {
         ((static_cast<T*>(this))->*name)();
     }
-
+private:
     void (T::*name)();
 };
 
@@ -25,6 +25,7 @@ public:
     WasRun(void (WasRun::*name)()) : TestCase(name)
     {
         wasRun = false;
+        wasSetUp = false;
     }
 
     void testMethod()
@@ -33,6 +34,7 @@ public:
     }
 
     bool wasRun;
+    bool wasSetUp;
 };
 
 class TestCaseTest
@@ -51,11 +53,21 @@ public:
 
         delete test;
     }
+
+    void testSetUp()
+    {
+        WasRun* test = new WasRun(&WasRun::testMethod);
+        test->run();
+        std::cout << test->wasSetUp << std::endl;
+
+        delete test;
+    }
 };
 
 int main()
 {
     TestCaseTest(&TestCaseTest::testRunning).run();
+    TestCaseTest(&TestCaseTest::testSetUp).run();
 
     return 0;
 }
