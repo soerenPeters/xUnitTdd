@@ -11,12 +11,15 @@ public:
     }
 
     virtual void setUp(){}
+    virtual void tearDown(){}
 
     void run()
     {
         setUp();
         ((static_cast<T*>(this))->*name)();
+        tearDown();
     }
+
 private:
     void (T::*name)();
 };
@@ -40,6 +43,11 @@ public:
         log += "wasRun ";
     }
 
+    void tearDown()
+    {
+        log += "tearDown ";
+    }
+
     std::string log;
 };
 
@@ -49,16 +57,11 @@ class TestCaseTest
 public:
     TestCaseTest(void (TestCaseTest::*name)()) : TestCase(name) {}
 
-    void setUp()
-    {
-
-    }
-
     void testTemplateMethod()
     {
         test = new WasRun(&WasRun::testMethod);
         test->run();
-        assert(test->log  == "setUp wasRun teardown ");
+        assert(test->log  == "setUp wasRun tearDown ");
 
         delete test;
     }
