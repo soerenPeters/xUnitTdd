@@ -27,22 +27,20 @@ class WasRun
 public:
     WasRun(void (WasRun::*name)()) : TestCase(name)
     {
-        wasSetUp = false;
+
     }
 
     void setUp()
     {
-        wasRun = false;
-        wasSetUp = true;
+        log += "setUp ";
     }
 
     void testMethod()
     {
-        wasRun = true;
+        log += "wasRun ";
     }
 
-    bool wasRun;
-    bool wasSetUp;
+    std::string log;
 };
 
 class TestCaseTest
@@ -53,21 +51,14 @@ public:
 
     void setUp()
     {
+
+    }
+
+    void testTemplateMethod()
+    {
         test = new WasRun(&WasRun::testMethod);
-    }
-
-    void testRunning()
-    {
         test->run();
-        assert(test->wasRun);
-
-        delete test;
-    }
-
-    void testSetUp()
-    {
-        test->run();
-        assert(test->wasSetUp);
+        assert(test->log  == "setUp wasRun ");
 
         delete test;
     }
@@ -77,8 +68,7 @@ public:
 
 int main()
 {
-    TestCaseTest(&TestCaseTest::testRunning).run();
-    TestCaseTest(&TestCaseTest::testSetUp).run();
+    TestCaseTest(&TestCaseTest::testTemplateMethod).run();
 
     return 0;
 }
