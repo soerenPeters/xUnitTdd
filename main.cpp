@@ -50,19 +50,17 @@ public:
     virtual void setUp(){}
     virtual void tearDown(){}
 
-    TestResult run()
+    void run(TestResult* result)
     {
-        TestResult result = TestResult();
-        result.testStarted();
+        result->testStarted();
         setUp();
         try {
             ((static_cast<T*>(this))->*name)();
             tearDown();
         } catch(std::exception)
         {
-            result.testFailed();
+            result->testFailed();
         }
-        return result;
     }
 
 private:
@@ -106,12 +104,17 @@ class TestSuite
 public:
     void add(WasRun* test)
     {
+        tests.push_back(test);
+    }
 
-    }
-    TestResult run()
+    void run(TestResult *result)
     {
-        return TestResult();
+        for (WasRun* test : tests)
+            test->run(result);
     }
+
+private:
+    std::vector<WasRun*> tests;
 
 };
 
@@ -124,30 +127,32 @@ public:
     void setUp() override
     {
         passingTest = new WasRun(&WasRun::testMethod);
+        result = new TestResult();
     }
 
     void tearDown() override
     {
         delete passingTest;
+        delete result;
     }
 
     void testTemplateMethod()
     {
-        passingTest->run();
+        passingTest->run(result);
         assert(passingTest->log  == "setUp wasRun tearDown ");
     }
 
     void testResult()
     {
-        TestResult result = passingTest->run();
-        assert(result.summary()  == "1 run, 0 failed");
+        passingTest->run(result);
+        assert(result->summary()  == "1 run, 0 failed");
     }
 
     void testBrokenTest()
     {
         WasRun* failingTest = new WasRun(&WasRun::brokenTestMethod);
-        TestResult result = failingTest->run();
-        assert(result.summary()  == "1 run, 1 failed");
+        failingTest->run(result);
+        assert(result->summary()  == "1 run, 1 failed");
         delete failingTest;
     }
 
@@ -157,22 +162,28 @@ public:
 
         suite->add(new WasRun(&WasRun::testMethod));
         suite->add(new WasRun(&WasRun::brokenTestMethod));
-        TestResult result = suite->run();
+        suite->run(result);
 
-        assert(result.summary()  == "2 run, 1 failed");
+        assert(result->summary()  == "2 run, 1 failed");
         delete suite;
     }
 
 private:
     WasRun* passingTest;
+    TestResult* result;
 };
 
 int main()
 {
-    std::cout << TestCaseTest(&TestCaseTest::testTemplateMethod).run().summary() << std::endl;
-    std::cout << TestCaseTest(&TestCaseTest::testResult).run().summary() << std::endl;
-    std::cout << TestCaseTest(&TestCaseTest::testBrokenTest).run().summary() << std::endl;
-    std::cout << TestCaseTest(&TestCaseTest::testSuite).run().summary() << std::endl;
+    TestResult* result = new TestResult();
+    TestSuite suite;
+    TestCaseTest(&TestCaseTest::testTemplateMethod).run(result);
+    TestCaseTest(&TestCaseTest::testResult).run(result);
+    TestCaseTest(&TestCaseTest::testBrokenTest).run(result);
+    TestCaseTest(&TestCaseTest::testSuite).run(result);
+
+    std::cout << result->summary() << std::endl;
+
 
     return 0;
 }
