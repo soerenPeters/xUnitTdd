@@ -8,6 +8,10 @@ public:
     {
         wasRun = false;
     }
+    void run()
+    {
+        this->testMethod();
+    }
     void testMethod()
     {
         wasRun = true;
@@ -20,7 +24,7 @@ int main()
 {
     WasRun* test = new WasRun("testMethod");
     std::cout << test->wasRun << std::endl;
-    test->testMethod();
+    test->run();
     std::cout << test->wasRun << std::endl;
 
     delete test;
