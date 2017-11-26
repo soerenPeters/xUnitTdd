@@ -1,28 +1,29 @@
 #include <iostream>
-#include <string>
 
 class WasRun
 {
 public:
-    WasRun(std::string name)
+    WasRun(void (WasRun::*name)())
     {
+        this->name = name;
         wasRun = false;
     }
     void run()
     {
-        this->testMethod();
+        (this->*name)();
     }
     void testMethod()
     {
         wasRun = true;
     }
 
+    void (WasRun::*name)();
     bool wasRun;
 };
 
 int main()
 {
-    WasRun* test = new WasRun("testMethod");
+    WasRun* test = new WasRun(&WasRun::testMethod);
     std::cout << test->wasRun << std::endl;
     test->run();
     std::cout << test->wasRun << std::endl;
