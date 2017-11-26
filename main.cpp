@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 #include <assert.h>
+#include <exception>
 
 class TestResult
 {
@@ -75,6 +76,11 @@ public:
         log += "wasRun ";
     }
 
+    void brokenTestMethod()
+    {
+        throw std::exception();
+    }
+
     void tearDown() override
     {
         log += "tearDown ";
@@ -111,6 +117,16 @@ public:
         assert(result.summary()  == "1 run, 0 failed");
     }
 
+    void testBrokenTest()
+    {
+        WasRun* test = new WasRun(&WasRun::brokenTestMethod);
+
+        TestResult result = test->run();
+        assert(result.summary()  == "1 run, 1 failed");
+
+        delete test;
+    }
+
 private:
     WasRun* test;
 };
@@ -119,6 +135,7 @@ int main()
 {
     TestCaseTest(&TestCaseTest::testTemplateMethod).run();
     TestCaseTest(&TestCaseTest::testResult).run();
+    TestCaseTest(&TestCaseTest::testBrokenTest).run();
 
     return 0;
 }
