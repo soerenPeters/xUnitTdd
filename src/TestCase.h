@@ -11,11 +11,11 @@ template <class T>
 class TestCase
 {
 public:
-    TestCase(void (T::*name)())
+    explicit TestCase(void (T::*testName)())
     {
-        this->name = name;
+        this->testName = testName;
     }
-    virtual ~TestCase(){}
+    virtual ~TestCase() = default;
 
     virtual void setUp(){}
     virtual void tearDown(){}
@@ -25,7 +25,7 @@ public:
         result->testStarted();
         setUp();
         try {
-            ((static_cast<T*>(this))->*name)();
+            ((static_cast<T*>(this))->*testName)();
             tearDown();
         } catch(std::exception)
         {
@@ -34,7 +34,7 @@ public:
     }
 
 private:
-    void (T::*name)();
+    void (T::*testName)();
 };
 
 #endif
