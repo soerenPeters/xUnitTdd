@@ -10,6 +10,7 @@ public:
     TestResult()
     {
         count = 0;
+        errorCount = 0;
     }
 
     void testStarted()
@@ -19,19 +20,20 @@ public:
 
     void testFailed()
     {
-
+        errorCount++;
     }
 
     std::string summary()
     {
         std::stringstream ss;
         ss << count;
-        ss <<  " run, 0 failed";
+        ss <<  " run, " << errorCount << " failed";
         return ss.str();
     }
 
 private:
     int count;
+    int errorCount;
 };
 
 template <class T>
