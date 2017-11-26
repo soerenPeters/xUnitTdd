@@ -17,6 +17,11 @@ public:
         count++;
     }
 
+    void testFailed()
+    {
+
+    }
+
     std::string summary()
     {
         std::stringstream ss;
@@ -131,6 +136,15 @@ public:
         delete test;
     }
 
+    void testFailedResult()
+    {
+        TestResult result;
+        result.testStarted();
+        result.testFailed();
+
+        assert(result.summary()  == "1 run, 1 failed");
+    }
+
 private:
     WasRun* test;
 };
@@ -140,6 +154,7 @@ int main()
     TestCaseTest(&TestCaseTest::testTemplateMethod).run();
     TestCaseTest(&TestCaseTest::testResult).run();
     TestCaseTest(&TestCaseTest::testBrokenTest).run();
+    TestCaseTest(&TestCaseTest::testFailedResult).run();
 
     return 0;
 }
