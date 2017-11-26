@@ -141,9 +141,9 @@ private:
 
 int main()
 {
-    TestCaseTest(&TestCaseTest::testTemplateMethod).run();
-    TestCaseTest(&TestCaseTest::testResult).run();
-    TestCaseTest(&TestCaseTest::testBrokenTest).run();
+    std::cout << TestCaseTest(&TestCaseTest::testTemplateMethod).run().summary() << std::endl;
+    std::cout << TestCaseTest(&TestCaseTest::testResult).run().summary() << std::endl;
+    std::cout << TestCaseTest(&TestCaseTest::testBrokenTest).run().summary() << std::endl;
 
     return 0;
 }
