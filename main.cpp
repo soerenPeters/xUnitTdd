@@ -58,7 +58,7 @@ public:
     {
         test = new WasRun(&WasRun::testMethod);
         test->run();
-        assert(test->log  == "setUp wasRun ");
+        assert(test->log  == "setUp wasRun teardown ");
 
         delete test;
     }
