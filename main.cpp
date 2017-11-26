@@ -52,11 +52,14 @@ public:
     {
         TestResult result = TestResult();
         result.testStarted();
-
         setUp();
-        ((static_cast<T*>(this))->*name)();
-        tearDown();
-
+        try {
+            ((static_cast<T*>(this))->*name)();
+            tearDown();
+        } catch(std::exception)
+        {
+            result.testFailed();
+        }
         return result;
     }
 
@@ -104,51 +107,36 @@ public:
 
     void setUp() override
     {
-        test = new WasRun(&WasRun::testMethod);
+        passingTest = new WasRun(&WasRun::testMethod);
     }
 
     void tearDown() override
     {
-        delete test;
+        delete passingTest;
     }
 
     void testTemplateMethod()
     {
-        test->run();
-        assert(test->log  == "setUp wasRun tearDown ");
+        passingTest->run();
+        assert(passingTest->log  == "setUp wasRun tearDown ");
     }
 
     void testResult()
     {
-        TestResult result = test->run();
+        TestResult result = passingTest->run();
         assert(result.summary()  == "1 run, 0 failed");
     }
 
     void testBrokenTest()
     {
-        WasRun* test = new WasRun(&WasRun::brokenTestMethod);
-
-        try {
-            TestResult result = test->run();
-            assert(result.summary()  == "1 run, 1 failed");
-        } catch(std::exception){
-            std::cout << "TODO later\n";
-        }
-
-        delete test;
-    }
-
-    void testFailedResult()
-    {
-        TestResult result;
-        result.testStarted();
-        result.testFailed();
-
+        WasRun* failingTest = new WasRun(&WasRun::brokenTestMethod);
+        TestResult result = failingTest->run();
         assert(result.summary()  == "1 run, 1 failed");
+        delete failingTest;
     }
 
 private:
-    WasRun* test;
+    WasRun* passingTest;
 };
 
 int main()
@@ -156,7 +144,6 @@ int main()
     TestCaseTest(&TestCaseTest::testTemplateMethod).run();
     TestCaseTest(&TestCaseTest::testResult).run();
     TestCaseTest(&TestCaseTest::testBrokenTest).run();
-    TestCaseTest(&TestCaseTest::testFailedResult).run();
 
     return 0;
 }
