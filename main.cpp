@@ -8,10 +8,11 @@ public:
     {
         wasRun = false;
     }
-    void testMethod(){
-
+    void testMethod()
+    {
+        wasRun = true;
     }
-    
+
     bool wasRun;
 };
 
