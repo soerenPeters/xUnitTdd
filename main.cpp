@@ -99,22 +99,23 @@ public:
     std::string log;
 };
 
+template <class T>
 class TestSuite
 {
 public:
-    void add(WasRun* test)
+    void add(TestCase<T>* test)
     {
         tests.push_back(test);
     }
 
     void run(TestResult *result)
     {
-        for (WasRun* test : tests)
+        for (TestCase<T>* test : tests)
             test->run(result);
     }
 
 private:
-    std::vector<WasRun*> tests;
+    std::vector<TestCase<T>*> tests;
 
 };
 
@@ -158,7 +159,7 @@ public:
 
     void testSuite()
     {
-        TestSuite* suite = new TestSuite();
+        TestSuite<WasRun>* suite = new TestSuite<WasRun>();
 
         suite->add(new WasRun(&WasRun::testMethod));
         suite->add(new WasRun(&WasRun::brokenTestMethod));
@@ -175,13 +176,14 @@ private:
 
 int main()
 {
-    TestResult* result = new TestResult();
-    TestSuite suite;
-    TestCaseTest(&TestCaseTest::testTemplateMethod).run(result);
-    TestCaseTest(&TestCaseTest::testResult).run(result);
-    TestCaseTest(&TestCaseTest::testBrokenTest).run(result);
-    TestCaseTest(&TestCaseTest::testSuite).run(result);
+    TestSuite<TestCaseTest> suite;
+    suite.add(new TestCaseTest(&TestCaseTest::testTemplateMethod));
+    suite.add(new TestCaseTest(&TestCaseTest::testResult));
+    suite.add(new TestCaseTest(&TestCaseTest::testBrokenTest));
+    suite.add(new TestCaseTest(&TestCaseTest::testSuite));
 
+    TestResult* result = new TestResult();
+    suite.run(result);
     std::cout << result->summary() << std::endl;
 
 
