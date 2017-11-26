@@ -1,33 +1,61 @@
 #include <iostream>
 
-class WasRun
+
+template <class T>
+class TestCase
 {
 public:
-    WasRun(void (WasRun::*name)())
+    TestCase(void (T::*name)())
     {
         this->name = name;
-        wasRun = false;
     }
+
     void run()
     {
-        (this->*name)();
+        ((static_cast<T*>(this))->*name)();
     }
+
+    void (T::*name)();
+};
+
+class WasRun
+        : public TestCase<WasRun>
+{
+public:
+    WasRun(void (WasRun::*name)()) : TestCase(name)
+    {
+        wasRun = false;
+    }
+
     void testMethod()
     {
         wasRun = true;
     }
 
-    void (WasRun::*name)();
     bool wasRun;
+};
+
+class TestCaseTest
+        : public TestCase<TestCaseTest>
+{
+public:
+    TestCaseTest(void (TestCaseTest::*name)()) : TestCase(name) {}
+
+    void testRunning()
+    {
+        WasRun* test = new WasRun(&WasRun::testMethod);
+
+        std::cout << test->wasRun << std::endl;
+        test->run();
+        std::cout << test->wasRun << std::endl;
+
+        delete test;
+    }
 };
 
 int main()
 {
-    WasRun* test = new WasRun(&WasRun::testMethod);
-    std::cout << test->wasRun << std::endl;
-    test->run();
-    std::cout << test->wasRun << std::endl;
+    TestCaseTest(&TestCaseTest::testRunning).run();
 
-    delete test;
     return 0;
 }
