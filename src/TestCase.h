@@ -27,8 +27,7 @@ public:
         try {
             ((static_cast<T*>(this))->*testName)();
             tearDown();
-        } catch(std::exception)
-        {
+        } catch(std::exception &e) {
             result->testFailed();
         }
     }

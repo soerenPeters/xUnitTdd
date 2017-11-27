@@ -1,7 +1,6 @@
 #ifndef TestCaseTest_H
 #define TestCaseTest_H
 
-#include <cassert>
 #include <memory>
 
 #include "TestCaseSpy.h"
@@ -29,20 +28,24 @@ public:
     void testTemplateMethod()
     {
         passingTest->run(result);
-        assert(passingTest->getLog()  == "setUp wasRun tearDown ");
+        if(passingTest->getLog()  != "setUp wasRun tearDown ")
+            throw std::exception();
     }
 
     void testResult()
     {
         passingTest->run(result);
-        assert(result->summary()  == "1 run, 0 failed");
+        if(result->summary()  != "1 run, 0 failed")
+            throw std::exception();
     }
 
     void testBrokenTest()
     {
         auto failingTest = new TestCaseSpy(&TestCaseSpy::brokenTestMethod);
         failingTest->run(result);
-        assert(result->summary()  == "1 run, 1 failed");
+        if(result->summary()  != "1 run, 1 failed")
+            throw std::exception();
+
         delete failingTest;
     }
 
@@ -54,7 +57,9 @@ public:
         suite->add(std::shared_ptr<TestCaseSpy>(new TestCaseSpy(&TestCaseSpy::brokenTestMethod)));
         suite->run(result);
 
-        assert(result->summary()  == "2 run, 1 failed");
+        if(result->summary()  != "2 run, 1 failed")
+            throw std::exception();
+
         delete suite;
     }
 
