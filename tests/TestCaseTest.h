@@ -16,13 +16,14 @@ public:
 
     void setUp() override
     {
-        passingTest = new TestCaseSpy(&TestCaseSpy::testMethod);
+        passingTest = std::make_shared<TestCaseSpy>(&TestCaseSpy::testMethod);
         result = std::make_shared<TestResult>();
     }
 
     void tearDown() override
     {
-        delete passingTest;
+        passingTest.reset();
+        result.reset();
     }
 
     void testTemplateMethod()
@@ -41,17 +42,15 @@ public:
 
     void testBrokenTest()
     {
-        auto failingTest = new TestCaseSpy(&TestCaseSpy::brokenTestMethod);
+        auto failingTest = std::make_shared<TestCaseSpy>(&TestCaseSpy::brokenTestMethod);
         failingTest->run(result);
         if(result->summary()  != "1 run, 1 failed")
             throw std::exception();
-
-        delete failingTest;
     }
 
     void testSuite()
     {
-        auto suite = new TestSuite<TestCaseSpy>();
+        auto suite = std::make_shared<TestSuite<TestCaseSpy> >();
 
         suite->add(std::shared_ptr<TestCaseSpy>(new TestCaseSpy(&TestCaseSpy::testMethod)));
         suite->add(std::shared_ptr<TestCaseSpy>(new TestCaseSpy(&TestCaseSpy::brokenTestMethod)));
@@ -59,12 +58,10 @@ public:
 
         if(result->summary()  != "2 run, 1 failed")
             throw std::exception();
-
-        delete suite;
     }
 
 private:
-    TestCaseSpy* passingTest;
+    std::shared_ptr<TestCaseSpy> passingTest;
     std::shared_ptr<TestResult> result;
 };
 
